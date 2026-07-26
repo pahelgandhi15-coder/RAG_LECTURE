@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lecture RAG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="app">
+
+    <header>
+      <div class="eyebrow"><span class="rec-dot"></span>lecture rag</div>
+      <h1>Ask the lecture<span class="cursor">_</span></h1>
+      <p class="subtitle">Drop a YouTube lecture. Get a transcript-grounded tutor that answers from what was actually said.</p>
+    </header>
+
+    <section class="panel" id="input-panel">
+      <label class="field-label" for="url-input">Lecture URL</label>
+      <div class="url-row">
+        <input id="url-input" type="text" placeholder="https://www.youtube.com/watch?v=…" autocomplete="off" spellcheck="false" />
+        <button id="process-btn"><span>Process</span></button>
+      </div>
+
+      <div id="status-row" class="status-row hidden">
+        <div class="filmstrip">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <span id="status-text" class="status-text">queued</span>
+      </div>
+
+      <p id="error-text" class="error hidden"></p>
+    </section>
+
+    <section class="panel hidden" id="chat-panel">
+      <div class="chat-head">
+        <div class="chat-head-title">Transcript loaded</div>
+        <button id="reset-btn" class="ghost-btn" title="Load a different lecture">New lecture</button>
+      </div>
+
+      <div id="chat-log" class="chat-log"></div>
+
+      <div class="ask-row">
+        <input id="question-input" type="text" placeholder="Ask something about the lecture…" autocomplete="off" spellcheck="false" />
+        <button id="ask-btn"><span>Ask</span></button>
+      </div>
+    </section>
+
+    <footer>
+      <span>answers are grounded in the transcript, not general knowledge</span>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
