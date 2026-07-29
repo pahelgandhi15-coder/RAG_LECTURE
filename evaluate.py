@@ -83,8 +83,8 @@ def compute_hallucination(answer: str, context: str, embed_fn) -> dict:
     return {"Hallucination Rate": round(h, 4), "Grounded Rate": round(1 - h, 4)}
 
 
-def evaluate_one(db, embedding, query: str) -> dict:
-    result = qa.answer_question(db, query)
+def evaluate_one(db, video_id, embedding, query: str) -> dict:
+    result = qa.answer_question(db, video_id, query)
     answer = result["answer"]
     chunks = result["context_chunks"]
     context = " ".join(chunks)
@@ -116,7 +116,7 @@ def main():
     with open(args.questions, encoding="utf-8") as f:
         questions = [line.strip() for line in f if line.strip()]
 
-    rows = [evaluate_one(db, embedding, q) for q in questions]
+    rows = [evaluate_one(db, args.video_id, embedding, q) for q in questions]
     df = pd.DataFrame(rows)
 
     metric_cols = [c for c in df.columns if c not in ("Question", "Language", "Answer")]

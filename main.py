@@ -2,9 +2,10 @@
 FastAPI backend for the Lecture RAG app.
 
 Endpoints:
-  POST /api/process   { url }                 -> { video_id, cached }
-  GET  /api/status/{video_id}                  -> { stage, pct, done, error }
-  POST /api/ask        { video_id, question }  -> { answer, context_chunks }
+  POST /api/process    { url }                 -> { video_id, cached }
+  GET  /api/status/{video_id}                   -> { stage, pct, done, error }
+  POST /api/ask         { video_id, question }  -> { answer, context_chunks }
+  GET  /api/history/{video_id}                  -> [ { question, answer, created_at }, ... ]
 
 Processing (download/transcribe/embed) runs in a background thread so the
 server stays responsive while the frontend polls /api/status.
@@ -18,10 +19,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from rag import ingest, qa
+from rag import ingest, qa, history
 from rag.config import DATA_DIR
 
 app = FastAPI(title="Lecture RAG")
+history.init_db()
 
 JOBS: dict[str, dict] = {}
 JOBS_LOCK = threading.Lock()
@@ -92,8 +94,14 @@ def ask(req: AskRequest):
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-    result = qa.answer_question(db, req.question, k=req.k)
+    result = qa.answer_question(db, req.video_id, req.question, k=req.k)
+    history.save_turn(req.video_id, req.question, result["answer"])
     return result
+
+
+@app.get("/api/history/{video_id}")
+def get_history(video_id: str):
+    return history.get_history(video_id)
 
 
 # ── Serve the frontend ───────────────────────────────────────────────────────

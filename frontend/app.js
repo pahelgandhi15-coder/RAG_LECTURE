@@ -76,7 +76,7 @@ function pollStatus() {
         inputPanel.classList.add("hidden");
         chatPanel.classList.remove("hidden");
         if (chatLog.children.length === 0) {
-          addMessage("bot", "Video processed. Ask me anything about it.");
+          await loadHistory();
         }
         questionInput.focus();
       }
@@ -86,6 +86,28 @@ function pollStatus() {
       processBtn.disabled = false;
     }
   }, 1200);
+}
+
+async function loadHistory() {
+  try {
+    const res = await fetch(`/api/history/${currentVideoId}`);
+    if (!res.ok) throw new Error("Could not load history");
+    const turns = await res.json();
+
+    if (turns.length === 0) {
+      addMessage("bot", "Video processed. Ask me anything about it.");
+      return;
+    }
+
+    addMessage("bot", `Welcome back — showing ${turns.length} previous question${turns.length === 1 ? "" : "s"} about this lecture.`);
+    turns.forEach((turn) => {
+      addMessage("user", turn.question);
+      addMessage("bot", turn.answer);
+    });
+  } catch (err) {
+    // history is a nice-to-have; don't block the chat if it fails to load
+    addMessage("bot", "Video processed. Ask me anything about it.");
+  }
 }
 
 function timeLabel() {
